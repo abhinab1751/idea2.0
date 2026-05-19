@@ -1,3 +1,6 @@
+# Environment variables — NEVER commit .env with real secrets
+.env
+
 # Python-generated files
 __pycache__/
 *.py[oc]
@@ -8,3 +11,7 @@ wheels/
 
 # Virtual environments
 .venv
+
+# Local VS Code overrides (personal settings that should not be shared)
+.vscode/settings.local.json
+.vscode/*.local.json

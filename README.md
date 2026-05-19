@@ -1,28 +1,49 @@
-# Idea — Local Setup
+# idea — Setup Instructions
 
-This repo contains a Python FastAPI backend and a Next.js web frontend located in `app/web`.
+This file contains concise, precise local setup steps for development on macOS/Linux.
 
-## Requirements
+## Prerequisites
 
-- Python 3.8+ (recommended 3.11+)
-- Node.js 18+ and `pnpm`
+- Python 3.12 (installed and on PATH)
+- Docker & Docker Compose
+- Node.js 26 (or use `nvm`)
+- `pnpm` (enable via Corepack: `corepack enable && corepack prepare pnpm@latest --activate`)
 
-## Quick setup (macOS)
+## Quick local setup (exact commands)
 
-1. Create and activate a Python virtual environment from the repository root:
+Run these from the repository root.
+
+1. Copy environment file and set DB URL
 
 ```bash
-python -m venv .venv
-source .venv/bin/activate
+cp .env.example .env
+# If you run Postgres locally via Docker, set:
+# DATABASE_URL=postgresql+asyncpg://postgres:postgres@localhost:5432/idea
 ```
 
-2. Install Python dependencies:
+2. Start PostgreSQL (Docker Compose)
 
 ```bash
+docker compose up -d
+docker compose ps
+```
+
+3. Python: create virtualenv and install dependencies
+
+```bash
+python3 -m venv .venv
+source .venv/bin/activate
+pip install --upgrade pip
 pip install -r requirements.txt
 ```
 
-3. Install web dependencies and run the frontend:
+4. Start the API
+
+```bash
+python -m uvicorn app.api.main:app --reload --host 0.0.0.0 --port 8000
+```
+
+5. Web: install and start Next.js
 
 ```bash
 cd app/web
@@ -30,39 +51,13 @@ pnpm install
 pnpm dev
 ```
 
-4. Start the backend (run from repository root, in a separate terminal with the venv active):
+6. Verify services
 
-```bash
-uvicorn app.api.main:app --reload --host 127.0.0.1 --port 8000
-```
+- Next.js: http://localhost:3000
+- FastAPI: http://localhost:8000
+- API docs: http://localhost:8000/docs
 
-You should then be able to access the frontend (usually on http://localhost:3000) and the API at http://127.0.0.1:8000.
+Notes
 
-## Example one-shot setup script
-
-Save this snippet as `scripts/setup.sh` and run `bash scripts/setup.sh` (make it executable with `chmod +x scripts/setup.sh`) to perform the common setup steps automatically.
-
-```bash
-#!/usr/bin/env bash
-set -euo pipefail
-
-echo "Creating Python virtualenv..."
-python -m venv .venv
-echo "Activating virtualenv..."
-source .venv/bin/activate
-echo "Installing Python dependencies..."
-pip install -r requirements.txt
-
-echo "Installing web dependencies..."
-pushd app/web >/dev/null
-pnpm install
-popd >/dev/null
-
-echo "Setup complete.\nTo run backend: activate venv and run:\n  uvicorn app.api.main:app --reload --host 127.0.0.1 --port 8000\nTo run frontend: cd app/web && pnpm dev"
-
-```
-
-## Notes
-
-- If you prefer Docker, you can containerize the services; this repo does not include Dockerfiles by default.
-- Adjust Python/Node versions to match your environment.
+- Use `docker compose down -v` to remove DB volume (destructive).
+- For an identical Linux dev environment prefer the VS Code Dev Container if available.
