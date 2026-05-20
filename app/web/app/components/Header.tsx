@@ -19,7 +19,7 @@ export default function Header({ connected, alertCount, onRefresh }: HeaderProps
           <span className="absolute -top-1 -right-1 w-3 h-3 bg-cyber-green rounded-full blink border-2 border-cyber-card" />
         </div>
         <div>
-          <h1 className="font-display text-xl font-bold tracking-widest text-white">
+          <h1 className="font-display text-xl font-bold tracking-widest text-cyber-text">
             GARUDA
           </h1>
           <p className="font-mono text-[10px] text-cyber-dim tracking-widest">

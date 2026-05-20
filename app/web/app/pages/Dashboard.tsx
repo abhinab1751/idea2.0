@@ -20,7 +20,50 @@ import {
   Shield,
   Activity,
   Zap,
+  Users,
+  Mail,
+  ShieldCheck,
+  Clock3,
 } from "lucide-react";
+
+type TeamMember = {
+  name: string;
+  role: string;
+  status: string;
+  focus: string;
+  load: string;
+};
+
+const TEAM: TeamMember[] = [
+  {
+    name: "Ava Chen",
+    role: "SOC Lead",
+    status: "Monitoring live threats",
+    focus: "Incident triage",
+    load: "92% active",
+  },
+  {
+    name: "Noah Patel",
+    role: "Vendor Risk Analyst",
+    status: "Reviewing third-party exposure",
+    focus: "Propagation pathways",
+    load: "74% active",
+  },
+  {
+    name: "Mia Rodriguez",
+    role: "Threat Intel Engineer",
+    status: "Updating intelligence feeds",
+    focus: "Indicators of compromise",
+    load: "61% active",
+  },
+  {
+    name: "Ethan Brooks",
+    role: "Mitigation Owner",
+    status: "Driving containment actions",
+    focus: "Blast radius reduction",
+    load: "48% active",
+  },
+];
 
 export default function Dashboard() {
   const [activeTab, setActiveTab] = useState("dashboard");
@@ -36,92 +79,17 @@ export default function Dashboard() {
   const topThreat = threats[0] || null;
   const totalAffected = threats.reduce((s, t) => s + t.affected_systems.length, 0);
 
-  return (
-    <div className="flex flex-col h-screen overflow-hidden bg-cyber-bg">
-      <Header
-        connected={connected}
-        alertCount={criticalCount}
-        onRefresh={refresh}
-      />
-
-      <div className="flex flex-1 overflow-hidden">
-        <Sidebar activeTab={activeTab} onTabChange={setActiveTab} />
-
-        <main className="flex-1 overflow-y-auto p-5 space-y-5">
-          {/* Top greeting row like reference image */}
-          <div className="flex items-center justify-between">
-            <div>
-              <h2 className="font-display text-2xl font-bold text-white">
-                Threat Intelligence Center
-              </h2>
-              <p className="font-sans text-sm text-cyber-dim mt-0.5">
-                Real-time vendor risk monitoring · {threats.length} events tracked
-              </p>
-            </div>
-            <div className="flex items-center gap-2 px-4 py-2 cyber-card">
-              <span className="font-mono text-[11px] text-cyber-dim">THREAT LEVEL:</span>
-              <span className={`font-mono text-sm font-bold ${criticalCount > 0 ? "text-cyber-red" : "text-cyber-green"}`}>
-                {criticalCount > 0 ? "CRITICAL" : "NOMINAL"}
-              </span>
-              <span className={`w-2 h-2 rounded-full blink ${criticalCount > 0 ? "bg-cyber-red" : "bg-cyber-green"}`} />
-            </div>
-          </div>
-
-          {/* Metric cards row - mirrors the reference dashboard layout */}
-          <div className="grid grid-cols-4 gap-4">
-            <RiskCard
-              label="Critical Threats"
-              value={criticalCount}
-              delta={criticalCount > 0 ? `+${criticalCount} active` : "None active"}
-              deltaType={criticalCount > 0 ? "up" : "neutral"}
-              icon={<AlertTriangle className="w-5 h-5" />}
-              accent="red"
-            />
-            <RiskCard
-              label="Avg Risk Score"
-              value={avgRisk}
-              delta="Real-time"
-              deltaType="neutral"
-              icon={<Activity className="w-5 h-5" />}
-              accent="accent"
-            />
-            <RiskCard
-              label="Systems at Risk"
-              value={totalAffected}
-              delta={`${simulation.initial_blast_radius} blast radius`}
-              deltaType="up"
-              icon={<Zap className="w-5 h-5" />}
-              accent="orange"
-            />
-            <RiskCard
-              label="Risk Reduction"
-              value={`${simulation.risk_reduction_percentage.toFixed(0)}%`}
-              delta="Post-mitigation"
-              deltaType="down"
-              icon={<Shield className="w-5 h-5" />}
-              accent="green"
-            />
-          </div>
-
-          {/* Executive Summary */}
-          <ExecutiveSummary topThreat={topThreat} />
-
-          {/* Attack Animation bar */}
-          <AttackAnimation simulation={simulation} />
-
-          {/* Main content: Propagation graph + Threat Feed + Mitigation */}
+  const tabContent = (() => {
+    if (activeTab === "dashboard") {
+      return (
+        <>
           <div className="grid grid-cols-12 gap-4">
-            {/* Propagation Graph - large center */}
             <div className="col-span-7 h-100">
               <PropagationGraph simulation={simulation} />
             </div>
-
-            {/* Threat Feed - right side */}
             <div className="col-span-3 h-100">
               <ThreatFeed threats={threats} loading={loading} />
             </div>
-
-            {/* Mitigation Panel */}
             <div className="col-span-2 h-100">
               <MitigationPanel
                 simulation={simulation}
@@ -131,20 +99,18 @@ export default function Dashboard() {
             </div>
           </div>
 
-          {/* Charts row */}
           <div className="grid grid-cols-3 gap-4">
             <TrendChart />
             <SeverityChart threats={threats} />
             <RiskHeatmap threats={threats} />
           </div>
 
-          {/* Current Tasks style table like reference image */}
           <div className="cyber-card">
             <div className="flex items-center justify-between px-5 py-4 border-b border-cyber-border">
               <div>
                 <h2 className="font-display font-semibold text-cyber-text">Active Vendor Threats</h2>
                 <p className="font-mono text-[11px] text-cyber-dim mt-0.5">
-                  Done {Math.round((threats.filter(t => t.severity === "LOW").length / Math.max(threats.length, 1)) * 100)}% mitigated
+                  Done {Math.round((threats.filter((t) => t.severity === "LOW").length / Math.max(threats.length, 1)) * 100)}% mitigated
                 </p>
               </div>
               <button className="font-mono text-[11px] text-cyber-accent border border-cyber-accent/30 px-3 py-1.5 rounded-lg hover:bg-cyber-accent/10 transition-colors">
@@ -202,6 +168,171 @@ export default function Dashboard() {
               ))}
             </div>
           </div>
+        </>
+      );
+    }
+
+    if (activeTab === "propagation" || activeTab === "graph") {
+      return (
+        <div className="cyber-card p-4">
+          <h3 className="font-display text-lg mb-3">
+            {activeTab === "graph" ? "Graph View" : "Propagation Graph"}
+          </h3>
+          <PropagationGraph simulation={simulation} />
+        </div>
+      );
+    }
+
+    if (activeTab === "threats") {
+      return (
+        <div className="cyber-card p-4">
+          <h3 className="font-display text-lg mb-3">Threats</h3>
+          <ThreatFeed threats={threats} loading={loading} />
+        </div>
+      );
+    }
+
+    if (activeTab === "feed") {
+      return (
+        <div className="cyber-card p-4">
+          <h3 className="font-display text-lg mb-3">Live Feed</h3>
+          <ThreatFeed threats={threats} loading={loading} />
+        </div>
+      );
+    }
+
+    if (activeTab === "vendors") {
+      return (
+        <div className="cyber-card p-4 space-y-4">
+          <div>
+            <h3 className="font-display text-lg mb-1">Vendors</h3>
+            <p className="font-mono text-[11px] text-cyber-dim">
+              Highest-risk vendors ranked by the latest threat feed.
+            </p>
+          </div>
+          <RiskHeatmap threats={threats} />
+        </div>
+      );
+    }
+
+    if (activeTab === "team") {
+      return (
+        <div className="cyber-card p-5 space-y-4">
+          <div className="flex items-center gap-2">
+            <Users className="w-4 h-4 text-cyber-accent" />
+            <h3 className="font-display text-lg">Team</h3>
+          </div>
+          <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-4">
+            {TEAM.map((member) => (
+              <div key={member.name} className="rounded-xl border border-cyber-border bg-cyber-bg p-4">
+                <div className="flex items-start justify-between gap-3 mb-3">
+                  <div>
+                    <p className="font-semibold text-cyber-text">{member.name}</p>
+                    <p className="font-mono text-[10px] text-cyber-dim uppercase tracking-widest">{member.role}</p>
+                  </div>
+                  <span className="font-mono text-[10px] px-2 py-0.5 rounded-full bg-cyber-accent/10 text-cyber-accent border border-cyber-accent/20">
+                    {member.load}
+                  </span>
+                </div>
+
+                <div className="space-y-2 text-sm">
+                  <div className="flex items-center gap-2 text-cyber-dim">
+                    <ShieldCheck className="w-3.5 h-3.5 text-cyber-green" />
+                    <span>{member.status}</span>
+                  </div>
+                  <div className="flex items-center gap-2 text-cyber-dim">
+                    <Clock3 className="w-3.5 h-3.5 text-cyber-orange" />
+                    <span>{member.focus}</span>
+                  </div>
+                  <div className="flex items-center gap-2 text-cyber-dim">
+                    <Mail className="w-3.5 h-3.5 text-cyber-accent" />
+                    <span>ops@garuda.internal</span>
+                  </div>
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+      );
+    }
+
+    return null;
+  })();
+
+  return (
+    <div className="flex flex-col h-screen overflow-hidden bg-cyber-bg">
+      <Header
+        connected={connected}
+        alertCount={criticalCount}
+        onRefresh={refresh}
+      />
+
+      <div className="flex flex-1 overflow-hidden">
+        <Sidebar activeTab={activeTab} onTabChange={setActiveTab} />
+
+        <main className="flex-1 overflow-y-auto p-5 space-y-5">
+          {/* Top greeting row like reference image */}
+          <div className="flex items-center justify-between">
+            <div>
+              <h2 className="font-display text-2xl font-bold text-cyber-text">
+                Threat Intelligence Center
+              </h2>
+              <p className="font-sans text-sm text-cyber-dim mt-0.5">
+                Real-time vendor risk monitoring · {threats.length} events tracked
+              </p>
+            </div>
+            <div className="flex items-center gap-2 px-4 py-2 cyber-card">
+              <span className="font-mono text-[11px] text-cyber-dim">THREAT LEVEL:</span>
+              <span className={`font-mono text-sm font-bold ${criticalCount > 0 ? "text-cyber-red" : "text-cyber-green"}`}>
+                {criticalCount > 0 ? "CRITICAL" : "NOMINAL"}
+              </span>
+              <span className={`w-2 h-2 rounded-full blink ${criticalCount > 0 ? "bg-cyber-red" : "bg-cyber-green"}`} />
+            </div>
+          </div>
+
+          {/* Metric cards row - mirrors the reference dashboard layout */}
+          <div className="grid grid-cols-4 gap-4">
+            <RiskCard
+              label="Critical Threats"
+              value={criticalCount}
+              delta={criticalCount > 0 ? `+${criticalCount} active` : "None active"}
+              deltaType={criticalCount > 0 ? "up" : "neutral"}
+              icon={<AlertTriangle className="w-5 h-5" />}
+              accent="red"
+            />
+            <RiskCard
+              label="Avg Risk Score"
+              value={avgRisk}
+              delta="Real-time"
+              deltaType="neutral"
+              icon={<Activity className="w-5 h-5" />}
+              accent="accent"
+            />
+            <RiskCard
+              label="Systems at Risk"
+              value={totalAffected}
+              delta={`${simulation.initial_blast_radius} blast radius`}
+              deltaType="up"
+              icon={<Zap className="w-5 h-5" />}
+              accent="orange"
+            />
+            <RiskCard
+              label="Risk Reduction"
+              value={`${simulation.risk_reduction_percentage.toFixed(0)}%`}
+              delta="Post-mitigation"
+              deltaType="down"
+              icon={<Shield className="w-5 h-5" />}
+              accent="green"
+            />
+          </div>
+
+          {/* Executive Summary */}
+          <ExecutiveSummary topThreat={topThreat} />
+
+          {/* Attack Animation bar */}
+          <AttackAnimation simulation={simulation} />
+
+          {tabContent}
         </main>
       </div>
 

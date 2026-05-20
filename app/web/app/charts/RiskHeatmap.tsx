@@ -32,7 +32,7 @@ export default function RiskHeatmap({ threats }: RiskHeatmapProps) {
               }}
               title={`${t.vendor} — Risk: ${t.risk_score}`}
             >
-              <p className="font-mono text-[9px] text-white/70 truncate">{t.vendor}</p>
+              <p className="font-mono text-[9px] text-cyber-text truncate">{t.vendor}</p>
               <p className="font-display text-sm font-bold" style={{ color }}>
                 {t.risk_score.toFixed(1)}
               </p>

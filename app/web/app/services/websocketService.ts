@@ -7,7 +7,15 @@ let handlers: AlertHandler[] = [];
 
 export function connectLiveAlertsSocket(onAlert: AlertHandler): () => void {
   if (!socket || socket.readyState === WebSocket.CLOSED) {
-    socket = new WebSocket(`${WS_URL}/live-alerts`);
+    try {
+      socket = new WebSocket(`${WS_URL}/live-alerts`);
+    } catch {
+      socket = null;
+      handlers.push(onAlert);
+      return () => {
+        handlers = handlers.filter((h) => h !== onAlert);
+      };
+    }
 
     socket.onopen = () => {
       console.log("[GARUDA] WebSocket connected");
@@ -22,8 +30,9 @@ export function connectLiveAlertsSocket(onAlert: AlertHandler): () => void {
       }
     };
 
-    socket.onerror = (err) => {
-      console.error("[GARUDA] WS error", err);
+    socket.onerror = () => {
+      socket?.close();
+      socket = null;
     };
 
     socket.onclose = () => {

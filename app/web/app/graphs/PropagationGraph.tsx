@@ -68,7 +68,7 @@ function CyberNode({ data }: NodeProps) {
         borderRadius: 10,
         padding: "10px 16px",
         minWidth: 120,
-        fontFamily: "JetBrains Mono, monospace",
+        fontFamily: "Ubuntu Mono, monospace",
         boxShadow: infected || isOrigin ? `0 0 16px ${borderColor}40` : "none",
       }}
     >

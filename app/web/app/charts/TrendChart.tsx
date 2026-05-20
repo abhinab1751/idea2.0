@@ -47,13 +47,13 @@ export default function TrendChart() {
           <CartesianGrid strokeDasharray="3 3" stroke="#1a2340" />
           <XAxis
             dataKey="time"
-            tick={{ fill: "#8892a4", fontSize: 9, fontFamily: "JetBrains Mono" }}
+            tick={{ fill: "#8892a4", fontSize: 9, fontFamily: "Ubuntu Mono, monospace" }}
             axisLine={false}
             tickLine={false}
             interval={2}
           />
           <YAxis
-            tick={{ fill: "#8892a4", fontSize: 9, fontFamily: "JetBrains Mono" }}
+            tick={{ fill: "#8892a4", fontSize: 9, fontFamily: "Ubuntu Mono, monospace" }}
             axisLine={false}
             tickLine={false}
             width={24}
@@ -63,7 +63,7 @@ export default function TrendChart() {
               background: "#0a0f1e",
               border: "1px solid #1a2340",
               borderRadius: 8,
-              fontFamily: "JetBrains Mono",
+              fontFamily: "Ubuntu Mono, monospace",
               fontSize: 11,
               color: "#e2e8f0",
             }}

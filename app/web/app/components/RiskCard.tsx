@@ -23,7 +23,7 @@ export default function RiskCard({ label, value, delta, deltaType, icon, accent 
 
   return (
     <div className="cyber-card p-5 flex items-center gap-4 glow-accent fade-in-up">
-      <div className={clsx("p-3 rounded-xl bg-white/5 border border-white/10", accentMap[accent])}>
+      <div className={clsx("p-3 rounded-xl bg-black/5 border border-black/10", accentMap[accent])}>
         {icon}
       </div>
       <div className="flex-1 min-w-0">

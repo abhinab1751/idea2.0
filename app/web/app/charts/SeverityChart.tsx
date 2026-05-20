@@ -36,12 +36,12 @@ export default function SeverityChart({ threats }: SeverityChartProps) {
         <BarChart data={data} barCategoryGap="30%">
           <XAxis
             dataKey="name"
-            tick={{ fill: "#8892a4", fontSize: 10, fontFamily: "JetBrains Mono" }}
+            tick={{ fill: "#8892a4", fontSize: 10, fontFamily: "Ubuntu Mono, monospace" }}
             axisLine={false}
             tickLine={false}
           />
           <YAxis
-            tick={{ fill: "#8892a4", fontSize: 10, fontFamily: "JetBrains Mono" }}
+            tick={{ fill: "#8892a4", fontSize: 10, fontFamily: "Ubuntu Mono, monospace" }}
             axisLine={false}
             tickLine={false}
             width={20}
@@ -51,7 +51,7 @@ export default function SeverityChart({ threats }: SeverityChartProps) {
               background: "#0a0f1e",
               border: "1px solid #1a2340",
               borderRadius: 8,
-              fontFamily: "JetBrains Mono",
+              fontFamily: "Ubuntu Mono, monospace",
               fontSize: 11,
               color: "#e2e8f0",
             }}
